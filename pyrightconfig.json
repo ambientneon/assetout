@@ -1,0 +1,8 @@
+{
+  "include": ["src"],
+  "typeCheckingMode": "standard",
+  "reportMissingTypeArgument": "none",
+  "reportCallIssue": "error",
+  "reportArgumentType": "error",
+  "reportUnknownParameterType": "warning"
+}
