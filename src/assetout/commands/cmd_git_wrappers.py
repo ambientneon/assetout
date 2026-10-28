@@ -14,11 +14,11 @@ console = Console()
 def run_git_add(paths: list[str]) -> None:
     root = find_repo_root(after_init=True)
 
-    # 1. сначала assetout
+    # 1. binaries
     console.print("[bold]assetout add[/bold] ...")
     run_add(paths)
 
-    # 2. потом обычный git add
+    # 2. code (git add)
     console.print("[bold]git add[/bold] ...")
     result = run_process(["git", "add", "--"] + paths, cwd=root)
 
@@ -31,10 +31,11 @@ def run_git_push(
     remote: str = "origin",
     branch: str | None = None,
     replace_all: bool = False,
+    update_tag: bool = True,
 ) -> None:
     root = find_repo_root(after_init=True)
 
-    # 1. сначала код
+    # 1. code (git push)
     cmd = ["git", "push", remote]
     if branch:
         cmd.append(branch)
@@ -46,6 +47,6 @@ def run_git_push(
         console.print(f"[red]Error:[/red] {result.stderr or 'git push failed'}")
         raise SystemExit(result.returncode)
 
-    # 2. потом бинарники
+    # 2. binaries
     console.print("[bold]assetout push[/bold] ...")
-    run_push(replace_all=replace_all)
+    run_push(replace_all=replace_all, update_tag=update_tag)

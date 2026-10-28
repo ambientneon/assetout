@@ -143,7 +143,7 @@ def _resolve_policy(cli_policy: str | None, config: dict[str, Any]) -> str:
     return policy
 
 
-# Policy handlers (каждая возвращает: copied, unresolved_entry | None)
+# Policy handlers (each returns: copied, unresolved_entry | None)
 def _handle_manual(
     rel: str,
     proj_ok: bool,
@@ -217,7 +217,7 @@ def _handle_local(
     force: bool,
     manifest: dict[str, Any],
 ) -> tuple[bool, dict[str, Any] | None, bool]:
-    """Возвращает (copied, unresolved_entry, manifest_dirty)."""
+    """Returns (copied, unresolved_entry, manifest_dirty)."""
     if not proj_ok:
         console.print(f"[red]missing in project[/red] {rel}")
         return False, {
@@ -257,9 +257,9 @@ def _process_one(
     manifest: dict[str, Any],
 ) -> tuple[bool, dict[str, Any] | None, bool]:
     """
-    Возвращает:
-        copied: bool
-        unresolved_entry: dict | None
+    Returns: 
+        copied: bool 
+        unresolved_entry: dict | None 
         manifest_dirty: bool
     """
     proj = get_project_path(root, rel)
@@ -268,7 +268,7 @@ def _process_one(
     proj_ok, proj_size, proj_hash = _file_info(root, proj)
     data_ok, data_size, data_hash = _file_info(root, data)
 
-    # оба есть и совпадают
+    # both are there and match
     if proj_ok and data_ok and proj_hash == data_hash:
         return False, None, False
 

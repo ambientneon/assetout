@@ -1,9 +1,9 @@
 # assetout/constants.py
 
-# Размеры по умолчанию (в удобном для человека виде)
-DEFAULT_MAX_GIT_FILE_SIZE = "10MB"          # что считаем "большим" для git
-DEFAULT_MAX_ARCHIVE_SIZE  = "1900MB"        # лимит одного zip (~1.9 GB)
-DEFAULT_MAX_FILE_SIZE     = "2048MB"        # лимит одного файла (GitHub hard limit)
+# Default sizes (in human-readable format)
+DEFAULT_MAX_GIT_FILE_SIZE = "10MB"          # What do we consider "big" for Git?
+DEFAULT_MAX_ARCHIVE_SIZE  = "1900MB"        # limit of one zip (~1.9 GB)
+DEFAULT_MAX_FILE_SIZE     = "2048MB"        # single file limit (GitHub hard limit)
 
 DEFAULT_HASH_ALGORITHM = "xxh3"
 DEFAULT_CONFLICT_POLICY = "ask"
@@ -16,7 +16,7 @@ CONFIG_FILE = "config.yaml"
 MANIFEST_FILE = "manifest.json"
 DATA_DIR_NAME = "data"
 
-# папки, которые никогда не обходим
+# folders that are never visited
 SKIP_DIR_NAMES = {
     ASSETOUT_DIR_NAME,
     ".git",

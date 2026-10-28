@@ -50,7 +50,7 @@ def _cleanup_empty_dirs(start: Path, stop: Path) -> None:
     current = start
     while current != stop and current.exists():
         try: 
-            current.rmdir() # только если пусто
+            current.rmdir() # only if empty
             current = current.parent
         except OSError:
             break

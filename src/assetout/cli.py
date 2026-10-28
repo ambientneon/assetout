@@ -77,9 +77,15 @@ def push(
         "-ra",
         help="Delete all existing assetout archives from the release before uploading.",
     ),
+    update_tag: bool = typer.Option(
+        True,
+        "--update-tag/--no-update-tag",
+        help="Move the release tag to current HEAD (default: yes). "
+             "With --no-update-tag the release is deleted and recreated instead.",
+    ),
 ) -> None:
     """Pack mirror into zip(s) and upload to GitHub Releases."""
-    run_push(replace_all=replace_all)
+    run_push(replace_all=replace_all, update_tag=update_tag)
 
     
 @app.command()
@@ -112,8 +118,8 @@ def git_add(
     paths: list[Path] = typer.Argument(..., help="Files/dirs to add"),
 ) -> None:
     """
-    1. assetout add (переносит большие файлы в mirror)
-    2. git add (остальное)
+    1. assetout add (moves large files to the mirror)
+    2. git add (the rest)
     """
     run_git_add([str(p) for p in paths])
 
@@ -123,12 +129,18 @@ def git_push(
     remote: str = typer.Argument("origin"),
     branch: Optional[str] = None,
     replace_all: bool = typer.Option(False, "--replace-all", "-ra"),
+    update_tag: bool = typer.Option(
+        True,
+        "--update-tag/--no-update-tag",
+        "-ut/-nut",
+        help="Move the release tag to current HEAD (default: yes).",
+    ),
 ) -> None:
     """
     1. git push
     2. assetout push (binaries)
     """
-    run_git_push(remote, branch, replace_all=replace_all)
+    run_git_push(remote, branch, replace_all=replace_all, update_tag=update_tag)
 
 
 if __name__ == "__main__":

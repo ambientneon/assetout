@@ -24,8 +24,8 @@ console = Console()
 # public
 def get_size_limits(config: dict[str, Any]) -> tuple[int, int]:
     """
-    Возвращает (max_archive_bytes, max_file_bytes).
-    Всегда читаем из конфига, константы — только fallback.
+    Returns (max_archive_bytes, max_file_bytes).
+    Always read from the config; constants are fallback only.
     """
     packaging = config.get("packaging") or {}
 
@@ -36,7 +36,7 @@ def get_size_limits(config: dict[str, Any]) -> tuple[int, int]:
 
 
 def group_key(rel: str, group_by_top_level: bool) -> str:
-    """Ключ группы: '' для корня или имя первой папки."""
+    """Group key: '' for root or first folder name."""
     if not group_by_top_level:
         return ""
 
@@ -53,7 +53,7 @@ def split_into_chunks(
     items: list[tuple[str, Path, int]],
     max_bytes: int,
 ) -> list[list[tuple[str, Path, int]]]:
-    """Жадно набивает архивы по размеру. items уже отсортированы."""
+    """Greedily stuffs archives by size. Items are already sorted."""
     chunks: list[list[tuple[str, Path, int]]] = []
     current: list[tuple[str, Path, int]] = []
     current_size = 0
@@ -79,7 +79,7 @@ def filter_too_large(
     items: list[tuple[str, Path, int]],
     max_bytes: int,
 ) -> list[tuple[str, Path, int]]:
-    """Пропускает файлы ≥ {human_size(max_bytes)} с предупреждением."""
+    """Skips files ≥ {human_size(max_bytes)} with a warning."""
     ok = []
     for rel, path, size in items:
         if size >= max_bytes:

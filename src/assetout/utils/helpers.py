@@ -121,13 +121,13 @@ def get_owner_repo(root: Path, config: dict[str, Any]) -> tuple[str, str]:
 
 def safe_copy(src: Path, dest: Path) -> None:
     """
-    Копирует файл атомарно:
-    1. пишет во временный файл в той же директории
-    2. os.replace (атомарно на большинстве FS)
+    Copies a file atomically:
+    1. Writes to a temporary file in the same directory
+    2. os.replace (atomically on most FS)
     """
     dest.parent.mkdir(parents=True, exist_ok=True)
 
-    # временный файл в той же директории, чтобы rename был атомарным
+    # temporary file in the same directory so that the rename is atomic
     fd, tmp_name = tempfile.mkstemp(
         prefix=f".{dest.name}.",
         suffix=".tmp",
@@ -139,9 +139,9 @@ def safe_copy(src: Path, dest: Path) -> None:
         with os.fdopen(fd, "wb") as tmp_f, open(src, "rb") as src_f:
             shutil.copyfileobj(src_f, tmp_f, length=1024 * 1024)
 
-        # сохраняем mtime/atime
+        # save mtime/atime
         shutil.copystat(src, tmp_path)
-        os.replace(tmp_path, dest)          # атомарно
+        os.replace(tmp_path, dest)          
     except Exception:
         tmp_path.unlink(missing_ok=True)
         raise
@@ -149,8 +149,8 @@ def safe_copy(src: Path, dest: Path) -> None:
 
 def sync_gitignore_tracked(root: Path, manifest: dict[str, Any] | None = None) -> None:
     """
-    Перезаписывает блок путей assetout в .gitignore по манифесту.
-    Всё до BEGIN и после END не меняется.
+    Overwrites the assetout path block in .gitignore based on the manifest.
+    Everything before BEGIN and after END remains unchanged.
     """
     begin_line = "# BEGIN assetout-tracked"
     end_line = "# END assetout-tracked"
@@ -221,10 +221,9 @@ def _parse_github_remote(url: str) -> tuple[str, str] | None:
 
 def _split_gitignore(content: str, begin_line: str, end_line: str) -> tuple[str, str]:
     """
-    Делит .gitignore на (до блока, после блока).
-    Если маркеров нет — весь файл = before, after пустой.
-    Если есть только BEGIN или только END — всё равно вырезаем
-    от первого BEGIN до первого END (или до конца).
+    Splits .gitignore into (before block, after block).
+    If there are no markers, the entire file = before, after is empty.
+    If there are only BEGIN or only END, we still cut from the first BEGIN to the first END (or to the end).
     """
     lines = content.splitlines(keepends=True)
     begin_idx = None
@@ -243,7 +242,7 @@ def _split_gitignore(content: str, begin_line: str, end_line: str) -> tuple[str,
         return content, ""
 
     if begin_idx is None:
-        # только END — считаем блок с начала файла
+        # only END - we count the block from the beginning of the file
         begin_idx = 0
     
     if end_idx is None:

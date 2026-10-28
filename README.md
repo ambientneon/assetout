@@ -13,6 +13,7 @@ A simple alternative to Git LFS when you only need to keep big files out of the 
 - Automatic split into multiple archives when over the size limit
 - Optional grouping by top-level project folder
 - Sync between project files and the mirror (`remote` / `local` / `manual`)
+- Automatic update of the release tag so Source code archives stay current
 - Wrappers: `git-add`, `git-push`
 
 ## Requirements
@@ -66,8 +67,8 @@ assetout sync          # mirror → project files
 | `init` | Create `.assetout/` (config, manifest, data dir) |
 | `add` | Add large files to the mirror |
 | `rm` | Remove from manifest and mirror |
-| `status` | Show tracked files and their state |
-| `push` | Pack mirror and upload to GitHub Releases |
+| `status`   | Show tracked files + release tag status relative to HEAD           |
+| `push`     | Pack mirror and upload to GitHub Releases (updates tag by default) |
 | `pull` | Download release archives into `.assetout/data/` |
 | `sync` | Sync between `.assetout/data/` and project files |
 | `git-add` | `assetout add` then `git add` |
@@ -76,7 +77,12 @@ assetout sync          # mirror → project files
 ### Useful flags
 
 ```bash
+# push
 assetout push --replace-all          # delete old assetout archives, then upload
+assetout push --update-tag           # move tag to HEAD (default)
+assetout push --no-update-tag        # delete + recreate release instead of moving tag
+
+# sync / rm
 assetout sync --policy local --force
 assetout rm path/to/file --project   # also delete from working tree
 ```
@@ -121,13 +127,25 @@ github:
 # day-to-day
 assetout git-add .
 git commit -m "Update assets"
-assetout git-push
+assetout git-push                # = git push + assetout push (with tag update)
 
 # or explicitly
 assetout add assets/
-assetout push
-git add . && git commit -m "..." && git push
+assetout push --replace-all
 ```
+
+
+### Updating the release tag
+
+By default `assetout push` moves the configured tag (`assets-latest`) to the current `HEAD`  
+and force-pushes it. This makes GitHub's automatic **Source code** archives contain the latest code.
+
+```bash
+assetout push                  # update tag (default)
+assetout push --no-update-tag  # delete + recreate release instead
+```
+
+Use `--no-update-tag` if your team forbids force-pushing tags.
 
 ## License
 

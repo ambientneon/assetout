@@ -12,10 +12,6 @@ from typing import Any
 from pathlib import Path
 from rich.console import Console
 
-from assetout.constants import (
-    ASSETOUT_DIR_NAME, 
-    DATA_DIR_NAME
-)
 from assetout.utils.paths import (
     find_repo_root,
     get_data_path
@@ -82,7 +78,6 @@ def run_pull() -> None:
             console.print(f"[green]ok[/green] ({n} files)")
 
     console.print(f"  total extracted: {total_files}")
-    # дальше verify как было
 
     console.print("  verify manifest ...")
     ok, failed = _verify_against_manifest(root, manifest)
@@ -96,7 +91,7 @@ def run_pull() -> None:
 
 # private
 def _download_url(url: str, dest: Path) -> bool:
-    """Анонимный HTTPS, потоковая запись на диск. True если ок."""
+    """Anonymous HTTPS, streaming to disk. True if ok"""
     try:
         req = urllib.request.Request(
             url,
@@ -131,7 +126,7 @@ def _download_via_gh(owner: str, repo: str, tag: str, asset_name: str, dest: Pat
         console.print(f"Install GitHub CLI and run: gh auth login")
         raise SystemExit(result.returncode)
 
-    # скачать в каталог dest.parent под именем asset
+    # download to the dest.parent directory under the name asset
     out_dir = dest.parent
     result = run_process(
         [
@@ -196,7 +191,7 @@ def _extract_zip(zip_path: Path, data_dir: Path) -> int:
             if info.is_dir():
                 continue
 
-            # защита от path traversal
+            # path traversal protection
             name = info.filename.replace("\\", "/")
             if name.startswith("/") or ".." in name.split("/"):
                 console.print(f"[yellow]Skip unsafe path in zip[/yellow] {name}")
@@ -213,7 +208,7 @@ def _extract_zip(zip_path: Path, data_dir: Path) -> int:
 
 
 def _verify_against_manifest(root: Path, manifest: dict[str, Any]) -> tuple[int, int]:
-    """Возвращает (ok, failed)."""
+    """Returns (ok, failed)."""
     data_dir = get_data_path(root)
     ok = failed = 0
 

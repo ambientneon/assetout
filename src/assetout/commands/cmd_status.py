@@ -10,23 +10,23 @@ from rich.table import Table
 from assetout.utils.paths import (
     find_repo_root,
     get_project_path,
-    get_data_path
+    get_data_path,
 )
 from assetout.utils.configs import (
     load_config,
-    load_manifest
+    load_manifest,
+    get_github_settings,
 )
 from assetout.utils.helpers import (
     human_size,
     parse_size,
     file_hash,
+    run_process,
 )
-
 
 console = Console()
 
 
-# public
 def run_status() -> None:
     root = find_repo_root(after_init=True)
     config = load_config(root)
@@ -35,6 +35,7 @@ def run_status() -> None:
 
     if not files:
         console.print("[dim]No large files tracked yet.[/dim]")
+        _print_release_tag_info(root, config)
         return
 
     table = Table(title="assetout status")
@@ -53,8 +54,47 @@ def run_status() -> None:
     console.print(f"\nTracked: {len(files)} file(s)")
     console.print(f"Max git size: {human_size(max_size)}")
 
+    _print_release_tag_info(root, config)
 
-# private
+
+def _print_release_tag_info(root: Path, config: dict[str, Any]) -> None:
+    """Shows where the release tag points relative to HEAD."""
+    tag, _ = get_github_settings(config)
+
+    # local tag
+    tag_res = run_process(["git", "rev-parse", "--short", f"{tag}^{{}}"], cwd=root)
+    if tag_res.returncode != 0:
+        console.print(f"\nRelease tag: [cyan]{tag}[/cyan] — [yellow]not found locally[/yellow]")
+        return
+
+    tag_sha = tag_res.stdout.strip()
+
+    # HEAD
+    head_res = run_process(["git", "rev-parse", "--short", "HEAD"], cwd=root)
+    head_sha = head_res.stdout.strip() if head_res.returncode == 0 else "?"
+
+    # how much commits behind
+    behind = 0
+    count_res = run_process(
+        ["git", "rev-list", "--count", f"{tag}..HEAD"],
+        cwd=root,
+    )
+    if count_res.returncode == 0 and count_res.stdout.strip().isdigit():
+        behind = int(count_res.stdout.strip())
+
+    if tag_sha == head_sha:
+        status = "[green]same as HEAD[/green]"
+    elif behind > 0:
+        commits = "commit" if behind == 1 else "commits"
+        status = f"[yellow]{behind} {commits} behind HEAD[/yellow]"
+    else:
+        status = "[dim]different from HEAD[/dim]"
+
+    console.print(
+        f"\nRelease tag: [cyan]{tag}[/cyan] → [bold]{tag_sha}[/bold]  ({status})"
+    )
+
+
 def _state_for_file(
     root: Path,
     rel: str,
@@ -75,7 +115,6 @@ def _state_for_file(
     if not mirror_exists:
         return "[yellow]missing in mirror[/yellow]"
 
-    # оба существуют — сверяем хэши
     proj_hash = file_hash(root, project)
     mirror_hash = file_hash(root, mirror)
     expected = entry.get("hash")

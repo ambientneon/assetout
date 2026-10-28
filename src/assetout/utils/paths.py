@@ -15,7 +15,7 @@ from assetout.constants import (
 console = Console()
 
 def find_repo_root(after_init: bool) -> Path:
-    """Ищем .git вверх. Если нет - текущая папка."""
+    """Look for .git at the top. If not, it's the current folder."""
     current = Path.cwd().resolve()
 
     for parent in [current, *current.parents]:
@@ -57,12 +57,12 @@ def get_rel_path(path: Path, root: Path) -> str | None:
 
 
 def resolve_rel(raw: str, root: Path, manifest: dict[str, Any]) -> str | None:
-    """Путь как в манифесте, либо существующий файл -> relative path."""
-    # уже ключ манифеста
+    """Path as in the manifest, or existing file -> relative path."""
+    # already the manifest key
     if raw in manifest.get("files", {}):
         return raw
 
-    # нормализация слэшей
+    # normalization of slashes
     normalized = raw.replace("\\", "/")
     if normalized in manifest.get("files", {}):
         return normalized
@@ -74,7 +74,7 @@ def resolve_rel(raw: str, root: Path, manifest: dict[str, Any]) -> str | None:
         if rel is not None:
             return rel
 
-    # относительный путь от корня репо
+    # relative path from the repo root
     candidate = (root / raw).resolve()
     rel = get_rel_path(candidate, root)
     return rel

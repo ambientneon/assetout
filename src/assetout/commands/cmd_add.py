@@ -70,7 +70,7 @@ def _is_git_ignored(root: Path, rel: str) -> bool:
         cwd=root
     )
 
-    # exit 0 = ignored, 1 = not ignored, 128 = error (нет git и т.п.)
+    # exit 0 = ignored, 1 = not ignored, 128 = error (not git и e.g.)
     return result.returncode == 0
 
 def _collect_files(raw_paths: list[str], root: Path) -> list[Path]:
@@ -89,7 +89,7 @@ def _collect_files(raw_paths: list[str], root: Path) -> list[Path]:
                 if not child.is_file():
                     continue
 
-                # пропускаем служебные директории
+                # skip service directories
                 try: 
                     rel_parts = child.relative_to(root).parts
                 except ValueError:
@@ -104,7 +104,7 @@ def _collect_files(raw_paths: list[str], root: Path) -> list[Path]:
 
         console.print(f"[yellow]Skip[/yellow] {raw} - path not found")
 
-    # уникальные пути, стабильный порядок
+    # unique paths, stable order
     unique = sorted(set(collected), key=lambda p: str(p).lower())
     return unique
 

@@ -22,7 +22,6 @@ from assetout.utils.helpers import (
 console = Console()
 
 def run_init() -> None:
-    """Точка входа команды init"""
     root = find_repo_root(after_init=False)
     config_path = get_config_path(root)
     manifest_path = get_manifest_path(root)

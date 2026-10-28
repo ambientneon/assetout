@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "assetout"
-version = "0.1.1"
+version = "0.2.0"
 description = "Keep large binary assets out of Git — store them in GitHub Releases"
 readme = "README.md"
 license = "MIT"
